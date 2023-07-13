@@ -1,0 +1,7 @@
+{
+  "name": "com.mvim.native",
+  "description": "Native C++ component of the mvim extension",
+  "path": "./out/x64/Debug/mvim-native.exe",
+  "type": "stdio",
+  "allowed_origins": [ "chrome-extension://ehkjonhcdeicojodibjechnejilhljia" ]
+}
