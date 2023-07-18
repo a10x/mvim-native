@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\KeyboardHandler.cpp" />
     <ClCompile Include="src\MessagingHandler.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
@@ -29,6 +30,7 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\KeyboardHandler.h" />
     <ClInclude Include="src\MessagingHandler.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
