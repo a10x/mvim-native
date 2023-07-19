@@ -1,5 +1,9 @@
 #include "KeyboardHandler.h"
 
+  //////////////////////////////////////////////////////////////////////////
+ //                             PROCESS_UTILS                            //
+//////////////////////////////////////////////////////////////////////////
+
 bool ProcessUtils::isChromeActive(){
 	const HWND hwnd = GetForegroundWindow();
 	DWORD pid;
@@ -21,5 +25,45 @@ bool ProcessUtils::isChromeActive(){
 	if (handle)CloseHandle(handle);
 
 	return isChrome;
+}
 
+  ///////////////////////////////////////////////////////////////////////////
+ //                           KEYBOARD_HANDLER                            //
+///////////////////////////////////////////////////////////////////////////
+
+KeyboardHandler* KeyboardHandler::instance = nullptr;
+
+KeyboardHandler* KeyboardHandler::get(){
+	if (!KeyboardHandler::instance) {
+		KeyboardHandler::instance = new KeyboardHandler();
+	}
+	return KeyboardHandler::instance;
+}
+
+LRESULT CALLBACK KeyboardHandler::_keyboardInputHook(int nCode, WPARAM inputType, LPARAM rawKeyInfo) {
+	if (nCode != HC_ACTION) return CallNextHookEx(NULL, nCode, inputType, rawKeyInfo);
+
+	KeyboardHandler::get()->keyboardInputHook(inputType, rawKeyInfo);
+
+	return CallNextHookEx(NULL, nCode, inputType, rawKeyInfo);
+}
+
+KeyboardHandler::KeyboardHandler(){
+	this->keyboardHook = SetWindowsHookExA(WH_KEYBOARD_LL, KeyboardHandler::_keyboardInputHook, NULL, NULL);
+}	
+
+KeyboardHandler::~KeyboardHandler(){
+	UnhookWindowsHookEx(this->keyboardHook);
+}
+
+void KeyboardHandler::registerKeyPress(int key, std::function<void()> func){
+	this->keyRegistry[key] = func;
+}
+
+void KeyboardHandler::keyboardInputHook(WPARAM inputType, LPARAM rawKeyInfo){
+	PKBDLLHOOKSTRUCT keyInfo = (PKBDLLHOOKSTRUCT) rawKeyInfo;
+	if (inputType == WM_KEYDOWN && ProcessUtils::isChromeActive()) {
+		int key = keyInfo->vkCode;
+		if(this->keyRegistry.contains(key)) this->keyRegistry[key]();
+	}
 }
