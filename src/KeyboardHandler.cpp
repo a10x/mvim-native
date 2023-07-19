@@ -4,17 +4,21 @@
  //                             PROCESS_UTILS                            //
 //////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
+
 bool ProcessUtils::isChromeActive(){
+	bool isChrome = true;
+	
 	const HWND hwnd = GetForegroundWindow();
 	DWORD pid;
 	GetWindowThreadProcessId(hwnd, &pid);
+
+	if (pid == ProcessUtils::cachedPid) return isChrome;
+
 	const HANDLE handle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
-	
 	char path[MAX_PATH + 1] = {0};
 	const char chromeFile[] = "chrome.exe";
 	int pathLength = GetModuleFileNameExA(handle, 0, path, MAX_PATH);
-
-	bool isChrome = true;
 
 	if (pathLength >= 10){
 		for (int i = 0; i < 10; ++i) {
@@ -22,6 +26,7 @@ bool ProcessUtils::isChromeActive(){
 		}
 	}
 
+	if (isChrome)ProcessUtils::cachedPid = pid;
 	if (handle)CloseHandle(handle);
 
 	return isChrome;

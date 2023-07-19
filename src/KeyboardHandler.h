@@ -7,6 +7,7 @@
 
 struct ProcessUtils {
 	
+	inline static DWORD cachedPid = 0;
 	static bool isChromeActive();
 };
 
